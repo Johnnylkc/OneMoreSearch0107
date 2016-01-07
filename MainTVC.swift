@@ -12,7 +12,10 @@ class MainTVC: UITableViewController {
     
     var candies = [Candy]()
     var filteredCandies = [Candy]()
+    
     let searchController = UISearchController(searchResultsController: nil)
+    //nil的意思就是以現在這個桌子顯示搜尋結果 當然也可以拿別的桌子來當作搜尋結果頁
+
 
     override func viewDidLoad()
     {
@@ -31,11 +34,16 @@ class MainTVC: UITableViewController {
                   Candy(category: "other", name: "009")]
         
         
+        //下面這幾個就是UISearchController的基本設定
         searchController.searchResultsUpdater = self
         searchController.dimsBackgroundDuringPresentation = false
-        searchController.definesPresentationContext = true
-        tableView.tableHeaderView = searchController.searchBar
+        //如果是true 那案搜尋的時候就會讓桌子變暗
         
+        searchController.definesPresentationContext = true
+        //讓UISearchController搜尋完資料要顯示出來
+        
+        tableView.tableHeaderView = searchController.searchBar
+        //就看要放在哪 當然也可以放在tableFooterView 只是我想應該沒有人會那樣做
     
     
     }
@@ -52,6 +60,8 @@ class MainTVC: UITableViewController {
         return 1
     }
 
+    
+    //基本上在numberOfRowsInSection和cellForRow都要判斷UISearchController有沒有被啟動 以及 輸入欄內有沒有打字
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int
     {
        if searchController.active && searchController.searchBar.text != ""
@@ -87,12 +97,14 @@ class MainTVC: UITableViewController {
     }
     
     
+    
+    //在didSelectRowAtIndexPath 一樣也要判斷搜尋有沒有被啟動 因為有啟動和沒啟動使用的model不同
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath)
     {
        
-        
         let controller = DetailVC()
         let candy : Candy
+       
         if searchController.active && searchController.searchBar.text != ""
         {
             candy = filteredCandies[indexPath.row]
@@ -101,9 +113,8 @@ class MainTVC: UITableViewController {
         {
             candy = candies[indexPath.row]
         }
-       // let candy = candies[indexPath.row]
+
         controller.newArray = candy
-        
         
         self.navigationController?.pushViewController(controller, animated: true)
     }
@@ -112,7 +123,7 @@ class MainTVC: UITableViewController {
     
  
     
-    
+    //我沒有做scopeBar 這裡的寫法是針對candy裡面的name做搜尋 而且只有小寫有效 大寫無效
     func filterContentForSearchText(searchText: String, scope: String = "All")
     {
         self.filteredCandies = candies.filter{ candy in
@@ -130,6 +141,8 @@ class MainTVC: UITableViewController {
    }///////////////整個table class的最後
 
 
+
+/////下面這兩個方法 是一定要寫 但tutorial的做法是寫在整個桌子的外面
 extension MainTVC: UISearchResultsUpdating
 {
     func updateSearchResultsForSearchController(searchController: UISearchController)
